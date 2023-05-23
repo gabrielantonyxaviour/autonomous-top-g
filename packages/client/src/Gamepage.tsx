@@ -3,6 +3,8 @@ import { useState } from "react";
 import { useMUD } from "./MUDContext";
 import { Chessboard } from "react-chessboard";
 import { Chess } from "chess.js";
+
+
 const GamePage = () => {
   const {
     components: { Counter },
@@ -15,35 +17,47 @@ const GamePage = () => {
   const [game, setGame] = useState(new Chess());
   const [currentTimeout, setCurrentTimeout] = useState<NodeJS.Timeout>();
 
-  function safeGameMutate(modify: any) {
-    setGame((g) => {
-      const update = { ...g };
-      modify(update);
-      return update;
-    });
-  }
+  const cloneObject = (obj) => {
+    return Object.create(
+      Object.getPrototypeOf(obj),
+      Object.getOwnPropertyDescriptors(obj)
+    );
+  };
 
   function makeRandomMove() {
+    console.log("making random move");
     const possibleMoves = game.moves();
+    console.log("possible moves:", possibleMoves);
 
     // exit if the game is over
-    if (game.game_over() || game.in_draw() || possibleMoves.length === 0)
+    if (game.isGameOver() || game.isDraw() || possibleMoves.length === 0)
       return;
-
-    const randomIndex = Math.floor(Math.random() * possibleMoves.length);
-    safeGameMutate((game: any) => {
-      game.move(possibleMoves[randomIndex]);
-    });
+    let isEvaluating = true;
+    let updatedGame = cloneObject(game);
+    // while (isEvaluating) {
+    let randomIndex = Math.floor(Math.random() * possibleMoves.length);
+    console.log("trying move:", possibleMoves[randomIndex]);
+    // try {
+    updatedGame.move(possibleMoves[randomIndex]);
+    isEvaluating = false;
+    setGame(updatedGame);
+    // } catch (e) {}
+    // }
   }
 
-  function onDrop(sourceSquare: any, targetSquare: any) {
-    const gameCopy = { ...game };
-    const move = gameCopy.move({
+  function onDrop(sourceSquare, targetSquare) {
+    const updatedGame = cloneObject(game);
+    console.log(game);
+
+    console.log("sourceSquare:", sourceSquare);
+    console.log("targetSquare:", targetSquare);
+
+    const move = updatedGame.move({
       from: sourceSquare,
       to: targetSquare,
       promotion: "q", // always promote to a queen for example simplicity
     });
-    setGame(gameCopy);
+    setGame(updatedGame);
 
     // illegal move
     if (move === null) return false;
@@ -53,6 +67,7 @@ const GamePage = () => {
     setCurrentTimeout(newTimeout);
     return true;
   }
+
 
   return (
     <>
@@ -79,22 +94,22 @@ const GamePage = () => {
           }}
         />
         <button
-          style={{}}
+          className="py-2 px-3 mt-4 bg-[#c79c2f] rounded-lg hover:bg-white hover:text-black transition ease-in-out delay-150 hover:scale-110 duration-300"
           onClick={() => {
-            safeGameMutate((game: any) => {
-              game.reset();
-            });
+            let updatedGame = cloneObject(game);
+            updatedGame.reset();
+            setGame(updatedGame);
             clearTimeout(currentTimeout);
           }}
         >
           reset
         </button>
         <button
-          style={{}}
+          className="ml-2 py-2 px-3 mt-4 bg-[#c79c2f] rounded-lg hover:bg-white hover:text-black transition ease-in-out delay-150 hover:scale-110 duration-300"
           onClick={() => {
-            safeGameMutate((game: any) => {
-              game.undo();
-            });
+            let updatedGame = cloneObject(game);
+            updatedGame.undo();
+            setGame(updatedGame);
             clearTimeout(currentTimeout);
           }}
         >
