@@ -1,0 +1,8 @@
+cairosvg
+python-chess
+pandas
+numpy
+tensorflow
+Flask
+Flask-RESTful
+python-dotenv
