@@ -22,12 +22,12 @@ contract GameStateManagementSystem is System {
     GameMovesData memory game=GameMoves.get(gameId);
     require(GameMoves.getState(gameId)==GameState.ONGOING,"Game is not ongoing");
 
-    if(addressToBytes32(_msgSender())==GameMoves.getPlayerAddress(gameId))
-    {
-      require(GameMoves.getTurn(gameId)==GameMoves.getPlayerColor(gameId),"Not your turn");
-    }else{
-      require(GameMoves.getTurn(gameId)!=GameMoves.getPlayerColor(gameId),"Not your turn");
-    }
+    // if(addressToBytes32(_msgSender())==GameMoves.getPlayerAddress(gameId))
+    // {
+    //   require(GameMoves.getTurn(gameId)==GameMoves.getPlayerColor(gameId),"Not your turn");
+    // }else{
+    //   require(GameMoves.getTurn(gameId)!=GameMoves.getPlayerColor(gameId),"Not your turn");
+    // }
       GameMoves.setFenCode(gameId,fenCode);
       GameMoves.setTurn(gameId,game.turn==Color.WHITE?Color.BLACK:Color.WHITE);
   }
